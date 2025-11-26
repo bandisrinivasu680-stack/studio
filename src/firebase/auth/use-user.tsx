@@ -10,7 +10,7 @@ interface AppUser extends User {
   isAdmin?: boolean;
 }
 
-const ADMIN_EMAIL = 'bandiganaram@gmail.com';
+const ADMIN_EMAIL = 'admin@freezone.com';
 
 export function useUser() {
   const auth = useAuth();
