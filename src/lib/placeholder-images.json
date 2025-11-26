@@ -1,3 +1,88 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "app-icon-1",
+      "description": "Icon for a productivity app",
+      "imageUrl": "https://images.unsplash.com/photo-1744390166772-d97effe676f6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8YWJzdHJhY3QlMjBsb2dvfGVufDB8fHx8MTc2NDExNDkzNnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract logo"
+    },
+    {
+      "id": "app-icon-2",
+      "description": "Icon for a social media app",
+      "imageUrl": "https://images.unsplash.com/photo-1579546929662-711aa81148cf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjb2xvcmZ1bCUyMGdyYWRpZW50fGVufDB8fHx8MTc2NDEzODU4NXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "colorful gradient"
+    },
+    {
+      "id": "app-icon-3",
+      "description": "Icon for a gaming app",
+      "imageUrl": "https://images.unsplash.com/photo-1758862493208-2046897d09d9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxnYW1pbmclMjBjaGFyYWN0ZXJ8ZW58MHx8fHwxNzY0MTM4NTg2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "gaming character"
+    },
+    {
+      "id": "app-icon-4",
+      "description": "Icon for a finance app",
+      "imageUrl": "https://images.unsplash.com/photo-1555103067-ff09c48881ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxtaW5pbWFsaXN0JTIwY2hhcnR8ZW58MHx8fHwxNzY0MTM4NTg1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "minimalist chart"
+    },
+    {
+      "id": "app-icon-5",
+      "description": "Icon for a health app",
+      "imageUrl": "https://images.unsplash.com/photo-1682706841289-9d7ddf5eb999?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxoZWFydGJlYXQlMjBsaW5lfGVufDB8fHx8MTc2NDEzODU4NXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "heartbeat line"
+    },
+    {
+      "id": "app-icon-6",
+      "description": "Icon for an education app",
+      "imageUrl": "https://images.unsplash.com/photo-1476275466078-4007374efbbe?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxib29rJTIwb3BlbnxlbnwwfHx8fDE3NjQwNzcyMzJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "book open"
+    },
+    {
+      "id": "app-icon-7",
+      "description": "Icon for a music app",
+      "imageUrl": "https://images.unsplash.com/photo-1650902565793-c2eb262aefbc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxtdXNpYyUyMG5vdGV8ZW58MHx8fHwxNzY0MTE5OTI5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "music note"
+    },
+    {
+      "id": "app-icon-8",
+      "description": "Icon for a travel app",
+      "imageUrl": "https://images.unsplash.com/photo-1667317067965-7b55b73bb522?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxhaXJwbGFuZSUyMHdvcmxkfGVufDB8fHx8MTc2NDEzODU4NXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "airplane world"
+    },
+    {
+      "id": "feature-graphic-1",
+      "description": "Feature graphic for a productivity app",
+      "imageUrl": "https://images.unsplash.com/photo-1542435503-956c469947f6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxvcmdhbml6ZWQlMjBkZXNrfGVufDB8fHx8MTc2NDExMTU1MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "organized desk"
+    },
+    {
+      "id": "feature-graphic-2",
+      "description": "Feature graphic for a social media app",
+      "imageUrl": "https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwZW9wbGUlMjBjb25uZWN0aW5nfGVufDB8fHx8MTc2NDEzODU4NXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "people connecting"
+    },
+    {
+      "id": "feature-graphic-3",
+      "description": "Feature graphic for a gaming app",
+      "imageUrl": "https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxmYW50YXN5JTIwbGFuZHNjYXBlfGVufDB8fHx8MTc2NDEzMDEyOHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "fantasy landscape"
+    },
+    {
+      "id": "screenshot-1",
+      "description": "App screenshot 1",
+      "imageUrl": "https://images.unsplash.com/photo-1654764450273-59862da1a259?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxhcHAlMjBpbnRlcmZhY2V8ZW58MHx8fHwxNzY0MDkxMTM1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "app interface"
+    },
+    {
+      "id": "screenshot-2",
+      "description": "App screenshot 2",
+      "imageUrl": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHx1c2VyJTIwcHJvZmlsZXxlbnwwfHx8fDE3NjQxMzA1ODR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "user profile"
+    },
+    {
+      "id": "screenshot-3",
+      "description": "App screenshot 3",
+      "imageUrl": "https://images.unsplash.com/photo-1763038311036-6d18805537e5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxkYXNoYm9hcmQlMjBjaGFydHxlbnwwfHx8fDE3NjQxMzg1ODd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "dashboard chart"
+    }
+  ]
 }
