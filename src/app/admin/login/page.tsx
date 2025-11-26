@@ -86,7 +86,7 @@ export default function AdminLoginPage() {
               />
             </div>
             <Button type="submit" className="w-full" disabled={isLoggingIn}>
-              <UserCog className="mr-2" /> {isLoggingin ? 'Signing In...' : 'Sign In'}
+              <UserCog className="mr-2" /> {isLoggingIn ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>
         </CardContent>
