@@ -1,0 +1,183 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the FreeZone Store.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "User's email address.",
+          "format": "email"
+        }
+      },
+      "required": [
+        "id",
+        "email"
+      ]
+    },
+    "App": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "App",
+      "type": "object",
+      "description": "Represents an application in the FreeZone Store.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the app."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the app."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the app."
+        },
+        "developer": {
+          "type": "string",
+          "description": "Name of the app developer."
+        },
+        "category": {
+          "type": "string",
+          "description": "Category of the app."
+        },
+        "apkFileLocation": {
+          "type": "string",
+          "description": "Location of the APK file on the server."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "developer",
+        "category",
+        "apkFileLocation"
+      ]
+    },
+    "Review": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Review",
+      "type": "object",
+      "description": "Represents a user review of an app.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the review."
+        },
+        "appId": {
+          "type": "string",
+          "description": "Reference to App. (Relationship: App 1:N Review)"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Review)"
+        },
+        "rating": {
+          "type": "number",
+          "description": "Rating given by the user (1-5 stars)."
+        },
+        "comment": {
+          "type": "string",
+          "description": "Text of the review comment."
+        }
+      },
+      "required": [
+        "id",
+        "appId",
+        "userId",
+        "rating",
+        "comment"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile information. Uses path-based ownership for private user data.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/apps/{appId}",
+        "definition": {
+          "entityName": "App",
+          "schema": {
+            "$ref": "#/backend/entities/App"
+          },
+          "description": "Stores application details.",
+          "params": [
+            {
+              "name": "appId",
+              "description": "The unique identifier for the app."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/reviews/{reviewId}",
+        "definition": {
+          "entityName": "Review",
+          "schema": {
+            "$ref": "#/backend/entities/Review"
+          },
+          "description": "Stores user reviews for apps. Includes denormalized 'userId' and 'appId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "reviewId",
+              "description": "The unique identifier for the review."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/apps/{appId}/reviews/{reviewId}",
+        "definition": {
+          "entityName": "Review",
+          "schema": {
+            "$ref": "#/backend/entities/Review"
+          },
+          "description": "Stores user reviews for apps. Includes denormalized 'userId' and 'appId' for authorization independence.",
+          "params": [
+            {
+              "name": "appId",
+              "description": "The unique identifier for the app."
+            },
+            {
+              "name": "reviewId",
+              "description": "The unique identifier for the review."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to provide a secure and scalable solution for the FreeZone Store application. It addresses the core design principles by prioritizing authorization independence, clarity of intent, DBAC, QAPs, and invariants. The structure leverages denormalization, structural segregation, and consistent access modeling.\n\n*   **Authorization Independence:** The `reviews` subcollection includes denormalized `userId` and `appId` fields, which allows security rules to validate the user's authorization to create or modify a review without needing to read the parent `App` or `User` document.\n*   **Structural Segregation:** The `apps` collection and the `users/{userId}/reviews` subcollection are separate, ensuring that data with different access requirements (app details vs. user-specific reviews) are not mixed.\n*   **Access Modeling:**\n    *   **Private User Data:** Uses path-based ownership for user-specific data, such as `/users/{userId}`.\n    *   **1:N User Owned Data:** `/users/{userId}/reviews/{reviewId}` establishes clear ownership where a user owns their reviews.\n    *   **Collaborative Data:** While not directly present, if a collaborative feature like shared app lists were added, a membership map (`members: {uid1: \"role\", uid2: \"role\"}`) would be the preferred method.\n*   **QAPs (Rules are not Filters):** List operations are secured by segregation. Listing apps requires no filtering, all apps are public. Listing reviews are always scoped to a user ( `/users/{userId}/reviews` ) or an app ( `/apps/{appId}/reviews` ). This prevents needing to filter based on access control.\n\nThis structure facilitates straightforward security rules that are easy to understand and maintain, enhancing the overall security and scalability of the FreeZone Store application."
+  }
+}

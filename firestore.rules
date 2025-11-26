@@ -1,0 +1,158 @@
+/**
+ * Core Philosophy: This ruleset enforces a hybrid security model suitable for an app store.
+ * It provides public read access to application data and their associated reviews, while
+ * strictly enforcing user ownership for user profiles and the management of user-generated
+ * content like reviews.
+ *
+ * Data Structure:
+ * - /users/{userId}: Private user-specific data, accessible only by the owning user.
+ * - /apps/{appId}: Publicly readable application details. Writes are currently restricted.
+ * - /users/{userId}/reviews/{reviewId}: A user-centric path for creating, updating, and deleting reviews. Access is restricted to the review's author.
+ * - /apps/{appId}/reviews/{reviewId}: A public, read-only path for displaying all reviews associated with a specific app.
+ *
+ * Key Security Decisions:
+ * - Public vs. Private Segregation: App data and reviews are public for reads via the /apps path. All user-specific data and write operations are secured under the /users/{userId} path.
+ * - Review Management: To ensure data integrity and enforce ownership, all write operations for reviews MUST go through the user-specific path (/users/{userId}/reviews/{reviewId}). The corresponding public path under /apps is strictly read-only.
+ * - User Privacy: Listing the root /users collection is disallowed to prevent enumeration of all users.
+ * - Denormalization for Authorization: Review documents contain a `userId` field, which is validated upon creation. This allows ownership to be checked without needing costly `get()` calls to other documents.
+ * - Restricted App Creation: The `App` entity lacks an owner/developer UID field. Therefore, all write operations on the `/apps` collection are disabled by default until the data model is updated to support secure authorization.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions for reusable logic
+    // ------------------------------------
+
+    /**
+     * Checks if a user is signed into the application.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Validates if the currently authenticated user's UID matches the provided userId.
+     * This is the foundation of the user-ownership model.
+     * @param userId The UID to check against the authenticated user.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Validates ownership for an existing document. Used for update and delete operations
+     * to ensure the target document exists before allowing the operation.
+     * @param userId The UID to check against the authenticated user.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    // Validation functions for data integrity
+    // ---------------------------------------
+
+    /**
+     * Validates the required fields for a new user document on creation.
+     * Ensures the document's ID matches the user's UID.
+     */
+    function hasValidUserCreateData(userId) {
+      let data = request.resource.data;
+      return data.id == userId;
+    }
+
+    /**
+     * Enforces immutability of the user ID on update.
+     */
+    function hasValidUserUpdateData() {
+      return request.resource.data.id == resource.data.id;
+    }
+
+    /**
+     * Validates the required fields for a new review document on creation.
+     * Enforces that the review's `userId` field matches the author's UID.
+     */
+    function hasValidReviewCreateData(userId) {
+      let data = request.resource.data;
+      return data.userId == userId;
+    }
+
+    /**
+     * Enforces immutability of core relational fields (`userId`, `appId`) on update.
+     */
+    function hasValidReviewUpdateData() {
+      let data = request.resource.data;
+      return data.userId == resource.data.userId
+          && data.appId == resource.data.appId;
+    }
+
+
+    // Collection Rules
+    // =============================================================================
+
+    /**
+     * @description Manages user profile data. Each user has exclusive access to their own document.
+     * @path /users/{userId}
+     * @allow (get) An authenticated user reads their own profile: `auth.uid == 'user_abc'`, path `/users/user_abc`
+     * @allow (create) A new user signs up and creates their profile document: `auth.uid == 'user_xyz'`, path `/users/user_xyz`
+     * @deny (get) A user tries to read another user's profile: `auth.uid == 'user_abc'`, path `/users/user_xyz`
+     * @deny (list) Any user tries to list all documents in the /users collection.
+     * @principle Restricts access to a user's own data tree and enforces self-creation.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && hasValidUserCreateData(userId);
+      allow update: if isExistingOwner(userId) && hasValidUserUpdateData();
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Stores application details. This data is public for anyone to read.
+     * @path /apps/{appId}
+     * @allow (get, list) Any user, signed in or not, can read app details.
+     * @deny (create, update, delete) Any user attempts to modify app data.
+     * @principle Provides public read access while restricting writes. Writes are disabled due to a missing ownership field in the data model.
+     */
+    match /apps/{appId} {
+      allow get: if true;
+      allow list: if true;
+      // CRITICAL: Cannot implement owner-only writes. The 'App' entity is missing an 'ownerId' or 'developerId' field linking it to a user UID.
+      allow create: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+      allow update: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+      allow delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+    }
+
+    /**
+     * @description The user-owned path for creating and managing reviews. A user can only manage their own reviews.
+     * @path /users/{userId}/reviews/{reviewId}
+     * @allow (create) An authenticated user creates a review under their own user path: `auth.uid == 'user_abc'`, path `/users/user_abc/reviews/review_123`
+     * @allow (update) The same user updates their review: `auth.uid == 'user_abc'`, path `/users/user_abc/reviews/review_123`
+     * @deny (create) A user tries to create a review under another user's path: `auth.uid == 'user_xyz'`, path `/users/user_abc/reviews/review_456`
+     * @deny (update) A user tries to forge the `userId` field in the review data during creation.
+     * @principle Enforces document ownership for all write operations and validates relational integrity on create.
+     */
+    match /users/{userId}/reviews/{reviewId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && hasValidReviewCreateData(userId);
+      allow update: if isExistingOwner(userId) && hasValidReviewUpdateData();
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description The public, read-only path for fetching reviews for a given app. No write operations are permitted here.
+     * @path /apps/{appId}/reviews/{reviewId}
+     * @allow (get, list) Any user, signed in or not, can read reviews for any app.
+     * @deny (create, update, delete) Any user attempts to modify reviews through this public path.
+     * @principle Provides public read access for denormalized data while forcing all writes through the secure, user-owned path.
+     */
+    match /apps/{appId}/reviews/{reviewId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+  }
+}
