@@ -1,13 +1,14 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth, useUser, initiateEmailSignIn } from '@/firebase';
+import { useAuth, useUser } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { UserCog } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 export default function AdminLoginPage() {
   const auth = useAuth();
@@ -35,20 +36,18 @@ export default function AdminLoginPage() {
       return;
     }
     setIsLoggingIn(true);
-    initiateEmailSignIn(auth, email, password);
-    // We don't need to handle success/error here as onAuthStateChanged will trigger the useEffect
-    // For simplicity, we won't show a specific "invalid password" error here
-    // A more robust solution would involve more complex state management
-    setTimeout(() => {
-      setIsLoggingIn(false);
-      if (!isAdmin) {
-         toast({
-          variant: 'destructive',
-          title: 'Login Failed',
-          description: 'Invalid credentials or not an admin account.',
-        });
-      }
-    }, 2000); // Give time for auth state to propagate
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+        // The useEffect will handle redirection on successful login
+    } catch (error) {
+        toast({
+            variant: 'destructive',
+            title: 'Login Failed',
+            description: 'Invalid credentials or not an admin account.',
+          });
+    } finally {
+        setIsLoggingIn(false);
+    }
   };
 
   if (loading || (user && isAdmin)) {
