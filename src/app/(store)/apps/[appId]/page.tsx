@@ -1,8 +1,7 @@
 'use client';
 import { useParams } from 'next/navigation';
-import { useDoc } from '@/firebase';
+import { useDoc, useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
 import type { App } from '@/lib/data';
 import Image from 'next/image';
 import { StarRating } from '@/components/star-rating';

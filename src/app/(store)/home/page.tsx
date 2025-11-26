@@ -1,9 +1,8 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCollection } from '@/firebase';
+import { useCollection, useFirestore } from '@/firebase';
 import { collection } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
 import type { App } from '@/lib/data';
 import { AppCard } from '@/components/app-card';
 import { Button } from '@/components/ui/button';
