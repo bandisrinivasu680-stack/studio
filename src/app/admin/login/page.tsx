@@ -1,8 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth, useUser } from '@/firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useAuth, useUser, initiateEmailSignIn } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,11 +19,11 @@ export default function AdminLoginPage() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   useEffect(() => {
-    if (!loading && isAdmin) {
+    if (!loading && user && isAdmin) {
       router.push('/admin/upload');
     }
   }, [user, isAdmin, loading, router]);
-
+  
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!auth || !email || !password) {
@@ -36,22 +35,23 @@ export default function AdminLoginPage() {
       return;
     }
     setIsLoggingIn(true);
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // Let the useEffect handle the redirect
-    } catch (error) {
-      console.error('Authentication error:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Login Failed',
-        description: 'Invalid email or password. Please try again.',
-      });
-    } finally {
+    initiateEmailSignIn(auth, email, password);
+    // We don't need to handle success/error here as onAuthStateChanged will trigger the useEffect
+    // For simplicity, we won't show a specific "invalid password" error here
+    // A more robust solution would involve more complex state management
+    setTimeout(() => {
       setIsLoggingIn(false);
-    }
+      if (!isAdmin) {
+         toast({
+          variant: 'destructive',
+          title: 'Login Failed',
+          description: 'Invalid credentials or not an admin account.',
+        });
+      }
+    }, 2000); // Give time for auth state to propagate
   };
 
-  if (loading || isAdmin) {
+  if (loading || (user && isAdmin)) {
     return <div className="flex items-center justify-center h-full">Loading...</div>;
   }
 
@@ -86,7 +86,7 @@ export default function AdminLoginPage() {
               />
             </div>
             <Button type="submit" className="w-full" disabled={isLoggingIn}>
-              <UserCog className="mr-2" /> {isLoggingIn ? 'Signing In...' : 'Sign In'}
+              <UserCog className="mr-2" /> {isLoggingin ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>
         </CardContent>

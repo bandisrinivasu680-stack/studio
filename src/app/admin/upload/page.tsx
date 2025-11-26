@@ -61,10 +61,10 @@ export default function UploadPage() {
   });
 
   useEffect(() => {
-    if (!userLoading && !user) {
+    if (!userLoading && !isAdmin) {
       router.push('/admin/login');
     }
-  }, [user, userLoading, router]);
+  }, [user, isAdmin, userLoading, router]);
 
   const onSubmit = async (data: AppFormValues) => {
     if (!firestore) {
