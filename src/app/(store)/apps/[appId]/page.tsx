@@ -50,7 +50,7 @@ export default function AppDetailsPage() {
           <h1 className="font-headline text-4xl font-bold">{typedApp.name}</h1>
           <p className="text-lg text-primary">{typedApp.developer}</p>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <span>{typedApp.rating.toFixed(1)} <StarRating rating={typedApp.rating} inline className="inline-flex" /></span>
+            <span>{typedApp.rating.toFixed(1)} <StarRating rating={typedApp.rating} className="inline-flex" /></span>
             <span>{typedApp.reviewsCount.toLocaleString()} reviews</span>
             <span>{typedApp.downloads} downloads</span>
           </div>

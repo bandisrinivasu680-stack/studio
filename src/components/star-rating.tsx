@@ -5,6 +5,7 @@ interface StarRatingProps {
   rating: number;
   size?: number;
   className?: string;
+  inline?: boolean; // Deprecated, use className="inline-flex"
 }
 
 export function StarRating({ rating, size = 16, className }: StarRatingProps) {
