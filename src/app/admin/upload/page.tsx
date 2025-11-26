@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useFirestore, useUser } from '@/firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { useFirestore, useUser, addDocumentNonBlocking } from '@/firebase';
+import { collection } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -73,7 +73,7 @@ export default function UploadPage() {
     }
     setIsSubmitting(true);
     try {
-      await addDoc(collection(firestore, 'apps'), {
+      addDocumentNonBlocking(collection(firestore, 'apps'), {
           ...data,
           screenshots: data.screenshots.map(s => s.value)
       });
@@ -183,7 +183,7 @@ export default function UploadPage() {
             </FormItem>
           )} />
           <FormField control={form.control} name="featureGraphicUrl" render={({ field }) => (
-            <FormIte>
+            <FormItem>
               <FormLabel>Feature Graphic URL</FormLabel>
               <FormControl><Input placeholder="https://picsum.photos/seed/feature1/1024/500" {...field} /></FormControl>
               <FormMessage />

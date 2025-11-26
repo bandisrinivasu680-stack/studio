@@ -1,15 +1,16 @@
 'use client';
 import { AppCard } from '@/components/app-card';
-import { useCollection } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
 import type { App } from '@/lib/data';
 
 export default function AppsPage() {
   const firestore = useFirestore();
-  const { data: apps, loading } = useCollection(
-    firestore ? collection(firestore, 'apps') : null
+  const appsCollection = useMemoFirebase(
+    () => (firestore ? collection(firestore, 'apps') : null),
+    [firestore]
   );
+  const { data: apps, loading } = useCollection(appsCollection);
 
   if (loading) {
     return <div>Loading...</div>;

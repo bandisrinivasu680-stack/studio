@@ -1,6 +1,6 @@
 'use client';
 import { useParams } from 'next/navigation';
-import { useDoc, useFirestore } from '@/firebase';
+import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { App } from '@/lib/data';
 import Image from 'next/image';
@@ -20,7 +20,10 @@ export default function AppDetailsPage() {
   const { appId } = params;
   const firestore = useFirestore();
 
-  const appRef = firestore && appId ? doc(firestore, 'apps', appId as string) : null;
+  const appRef = useMemoFirebase(
+    () => (firestore && appId ? doc(firestore, 'apps', appId as string) : null),
+    [firestore, appId]
+  );
   const { data: app, loading } = useDoc(appRef);
 
   if (loading) {

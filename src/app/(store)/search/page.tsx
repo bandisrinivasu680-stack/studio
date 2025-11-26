@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { VoiceSearchButton } from '@/components/voice-search-button';
 import { categories, trendingSearches } from '@/lib/data';
 import type { App } from '@/lib/data';
-import { useCollection, useFirestore } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import { Badge } from '@/components/ui/badge';
 import { AppCard } from '@/components/app-card';
@@ -13,9 +13,11 @@ import { Search } from 'lucide-react';
 export default function SearchPage() {
   const [searchText, setSearchText] = useState('');
   const firestore = useFirestore();
-  const { data: apps, loading } = useCollection(
-    firestore ? collection(firestore, 'apps') : null
+  const appsCollection = useMemoFirebase(
+    () => (firestore ? collection(firestore, 'apps') : null),
+    [firestore]
   );
+  const { data: apps, loading } = useCollection(appsCollection);
 
   const filteredApps = useMemo(() => {
     if (!searchText || !apps) return [];

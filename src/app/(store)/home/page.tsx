@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCollection, useFirestore } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import type { App } from '@/lib/data';
 import { AppCard } from '@/components/app-card';
@@ -17,9 +17,11 @@ import { ArrowRight } from 'lucide-react';
 
 export default function HomePage() {
   const firestore = useFirestore();
-  const { data: apps, loading } = useCollection(
-    firestore ? collection(firestore, 'apps') : null
+  const appsCollection = useMemoFirebase(
+    () => (firestore ? collection(firestore, 'apps') : null),
+    [firestore]
   );
+  const { data: apps, loading } = useCollection(appsCollection);
 
   if (loading) {
     return <div>Loading...</div>;
