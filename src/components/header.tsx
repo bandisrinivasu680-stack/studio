@@ -22,7 +22,7 @@ export function Header() {
     if (!auth) return;
     try {
       await signOut(auth);
-    } catch (error)
+    } catch (error) {
       console.error("Logout error:", error);
     }
   };
