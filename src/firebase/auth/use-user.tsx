@@ -10,6 +10,8 @@ interface AppUser extends User {
   isAdmin?: boolean;
 }
 
+const ADMIN_EMAIL = 'bandiganaram@gmail.com';
+
 export function useUser() {
   const auth = useAuth();
   const firestore = useFirestore();
@@ -24,27 +26,8 @@ export function useUser() {
 
     const unsubscribe = onAuthStateChanged(auth, async (userAuth) => {
       if (userAuth) {
-        if (firestore) {
-          const userDocRef = doc(firestore, 'users', userAuth.uid);
-          try {
-            const userDoc = await getDoc(userDocRef);
-            if (userDoc.exists() && userDoc.data()?.isAdmin) {
-              setUser({ ...userAuth, isAdmin: true });
-            } else {
-              // Check if a new user document needs to be created
-              if (!userDoc.exists()) {
-                // This is a good place to create a user document if one doesn't exist
-                // For now, we just set the user without admin rights
-              }
-              setUser(userAuth);
-            }
-          } catch (error) {
-            console.error("Error fetching user document:", error);
-            setUser(userAuth); // Fallback to user without admin status
-          }
-        } else {
-          setUser(userAuth);
-        }
+        const isAdmin = userAuth.email === ADMIN_EMAIL;
+        setUser({ ...userAuth, isAdmin });
       } else {
         setUser(null);
       }
