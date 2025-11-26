@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Store, LogIn, LogOut, Upload, UserCog } from 'lucide-react';
+import { Store, LogOut, Upload } from 'lucide-react';
 import { useAuth, useUser } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import {
@@ -43,7 +43,7 @@ export function Header() {
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
-          {user ? (
+          {user && (
              <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -56,7 +56,7 @@ export function Header() {
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{user.displayName}</p>
+                    <p className="text-sm font-medium leading-none">{user.displayName || user.email}</p>
                     <p className="text-xs leading-none text-muted-foreground">
                       {user.email}
                     </p>
@@ -77,21 +77,6 @@ export function Header() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          ) : (
-            <div className="flex items-center space-x-2">
-              <Button asChild>
-                <Link href="/login">
-                  <LogIn />
-                  <span className="hidden sm:inline-block">Login</span>
-                </Link>
-              </Button>
-               <Button variant="outline" asChild>
-                <Link href="/admin/login">
-                  <UserCog />
-                  <span className="hidden sm:inline-block">Admin</span>
-                </Link>
-              </Button>
-            </div>
           )}
         </div>
       </div>

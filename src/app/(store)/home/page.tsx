@@ -1,7 +1,8 @@
 'use client';
+import { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import type { App } from '@/lib/data';
 import { AppCard } from '@/components/app-card';
@@ -14,16 +15,28 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function HomePage() {
   const firestore = useFirestore();
+  const { user, loading: userLoading } = useUser();
+  const router = useRouter();
+  
   const appsCollection = useMemoFirebase(
     () => (firestore ? collection(firestore, 'apps') : null),
     [firestore]
   );
-  const { data: apps, loading } = useCollection(appsCollection);
+  const { data: apps, loading: appsLoading } = useCollection(appsCollection);
 
-  if (loading) {
+  useEffect(() => {
+    if (!userLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, userLoading, router]);
+
+  const loading = userLoading || appsLoading;
+
+  if (loading || !user) {
     return <div>Loading...</div>;
   }
 
