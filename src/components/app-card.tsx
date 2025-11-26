@@ -9,7 +9,7 @@ interface AppCardProps {
 
 export function AppCard({ app }: AppCardProps) {
   return (
-    <Link href="#" className="group space-y-2">
+    <Link href={`/apps/${app.id}`} className="group space-y-2">
       <div className="overflow-hidden rounded-xl">
         <Image
           src={app.iconUrl}

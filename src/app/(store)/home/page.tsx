@@ -1,6 +1,10 @@
+'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { apps } from '@/lib/data';
+import { useCollection } from '@/firebase';
+import { collection } from 'firebase/firestore';
+import { useFirestore } from '@/firebase';
+import type { App } from '@/lib/data';
 import { AppCard } from '@/components/app-card';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,9 +17,21 @@ import {
 import { ArrowRight } from 'lucide-react';
 
 export default function HomePage() {
-  const featuredApp = apps[2];
-  const recommendedApps = [...apps].sort(() => 0.5 - Math.random()).slice(0, 8);
-  const newApps = [...apps].sort((a,b) => b.id.localeCompare(a.id)).slice(0, 8);
+  const firestore = useFirestore();
+  const { data: apps, loading } = useCollection(
+    firestore ? collection(firestore, 'apps') : null
+  );
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  const typedApps = (apps as App[]) || [];
+  
+  const featuredApps = typedApps.slice(0, 3);
+  const recommendedApps = [...typedApps].sort(() => 0.5 - Math.random()).slice(0, 8);
+  const newApps = [...typedApps].sort((a,b) => (b.id || '').localeCompare(a.id || '')).slice(0, 8);
+
 
   return (
     <div className="space-y-12">
@@ -28,7 +44,7 @@ export default function HomePage() {
             className="relative"
           >
             <CarouselContent>
-              {[apps[2], apps[3], apps[4]].map((app) => (
+              {featuredApps.map((app) => (
                 <CarouselItem key={app.id}>
                   <div className="relative aspect-[16/7] w-full">
                     <Image
@@ -77,7 +93,7 @@ export default function HomePage() {
   );
 }
 
-function AppSection({ title, apps }: { title: string; apps: typeof import('@/lib/data').apps }) {
+function AppSection({ title, apps }: { title: string; apps: App[] }) {
   return (
     <section>
       <div className="mb-4 flex items-center justify-between">

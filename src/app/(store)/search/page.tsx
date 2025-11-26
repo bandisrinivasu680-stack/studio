@@ -2,23 +2,31 @@
 import { useState, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { VoiceSearchButton } from '@/components/voice-search-button';
-import { categories, trendingSearches, apps } from '@/lib/data';
+import { categories, trendingSearches } from '@/lib/data';
 import type { App } from '@/lib/data';
+import { useCollection } from '@/firebase';
+import { collection } from 'firebase/firestore';
+import { useFirestore } from '@/firebase';
 import { Badge } from '@/components/ui/badge';
 import { AppCard } from '@/components/app-card';
 import { Search } from 'lucide-react';
 
 export default function SearchPage() {
   const [searchText, setSearchText] = useState('');
+  const firestore = useFirestore();
+  const { data: apps, loading } = useCollection(
+    firestore ? collection(firestore, 'apps') : null
+  );
 
   const filteredApps = useMemo(() => {
-    if (!searchText) return [];
-    return apps.filter(app =>
+    if (!searchText || !apps) return [];
+    const typedApps = apps as App[];
+    return typedApps.filter(app =>
       app.name.toLowerCase().includes(searchText.toLowerCase()) ||
       app.developer.toLowerCase().includes(searchText.toLowerCase()) ||
       app.category.toLowerCase().includes(searchText.toLowerCase())
     );
-  }, [searchText]);
+  }, [searchText, apps]);
 
   const handleSearch = (text: string) => {
     setSearchText(text);
@@ -40,7 +48,7 @@ export default function SearchPage() {
       </div>
       
       {searchText ? (
-        <SearchResults apps={filteredApps} />
+        <SearchResults apps={filteredApps} loading={loading} />
       ) : (
         <SearchSuggestions onChipClick={handleSearch} />
       )}
@@ -85,7 +93,10 @@ function SearchSuggestions({ onChipClick }: { onChipClick: (text: string) => voi
   );
 }
 
-function SearchResults({ apps }: { apps: App[] }) {
+function SearchResults({ apps, loading }: { apps: App[], loading: boolean }) {
+  if (loading) {
+    return <div className="text-center text-muted-foreground">Searching...</div>;
+  }
   if (apps.length === 0) {
     return <div className="text-center text-muted-foreground">No apps found.</div>;
   }
