@@ -2,29 +2,27 @@
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Store, LogIn, LogOut, Upload } from 'lucide-react';
+import { Store, LogIn, LogOut, Upload, UserCog } from 'lucide-react';
 import { useAuth, useUser } from '@/firebase';
-import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { signOut } from 'firebase/auth';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export function Header() {
   const auth = useAuth();
   const { user, isAdmin } = useUser();
 
-  const handleLogin = async () => {
-    if (!auth) return;
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error("Authentication error:", error);
-    }
-  };
-
   const handleLogout = async () => {
     if (!auth) return;
     try {
       await signOut(auth);
-    } catch (error) {
+    } catch (error)
       console.error("Logout error:", error);
     }
   };
@@ -45,30 +43,55 @@ export function Header() {
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
-          {isAdmin && (
-            <Button variant="ghost" asChild>
-              <Link href="/admin/upload">
-                <Upload />
-                <span className="hidden sm:inline-block">Upload App</span>
-              </Link>
-            </Button>
-          )}
           {user ? (
-            <>
-              <Avatar>
-                <AvatarImage src={user.photoURL || undefined} />
-                <AvatarFallback>{user.email?.[0].toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <Button onClick={handleLogout} variant="ghost">
-                <LogOut />
-                 <span className="hidden sm:inline-block">Logout</span>
-              </Button>
-            </>
+             <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar>
+                    <AvatarImage src={user.photoURL || undefined} />
+                    <AvatarFallback>{user.email?.[0].toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{user.displayName}</p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {user.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin/upload">
+                      <Upload className="mr-2" />
+                      <span>Upload App</span>
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
-            <Button onClick={handleLogin}>
-              <LogIn />
-              <span className="hidden sm:inline-block">Login</span>
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Button asChild>
+                <Link href="/login">
+                  <LogIn />
+                  <span className="hidden sm:inline-block">Login</span>
+                </Link>
+              </Button>
+               <Button variant="outline" asChild>
+                <Link href="/admin/login">
+                  <UserCog />
+                  <span className="hidden sm:inline-block">Admin</span>
+                </Link>
+              </Button>
+            </div>
           )}
         </div>
       </div>

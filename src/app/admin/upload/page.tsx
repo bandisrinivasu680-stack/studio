@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -60,6 +60,12 @@ export default function UploadPage() {
     control: form.control,
   });
 
+  useEffect(() => {
+    if (!userLoading && !user) {
+      router.push('/admin/login');
+    }
+  }, [user, userLoading, router]);
+
   const onSubmit = async (data: AppFormValues) => {
     if (!firestore) {
         toast({ variant: 'destructive', description: 'Firestore is not available.' });
@@ -81,20 +87,16 @@ export default function UploadPage() {
     }
   };
 
-  if (userLoading) {
+  if (userLoading || !user) {
     return <div className="flex justify-center items-center h-full">Loading...</div>;
   }
   
-  if (!user) {
-    router.push('/home'); // Or a dedicated login page
-    return null;
-  }
-
   if (!isAdmin) {
     return (
       <div className="container mx-auto py-8 text-center">
         <h1 className="text-2xl font-bold text-destructive">Access Denied</h1>
-        <p>You do not have permission to view this page.</p>
+        <p>You do not have permission to view this page. Please sign in with an admin account.</p>
+        <Button onClick={() => router.push('/admin/login')} className="mt-4">Go to Admin Login</Button>
       </div>
     );
   }
@@ -181,7 +183,7 @@ export default function UploadPage() {
             </FormItem>
           )} />
           <FormField control={form.control} name="featureGraphicUrl" render={({ field }) => (
-            <FormItem>
+            <FormIte>
               <FormLabel>Feature Graphic URL</FormLabel>
               <FormControl><Input placeholder="https://picsum.photos/seed/feature1/1024/500" {...field} /></FormControl>
               <FormMessage />
